@@ -1,0 +1,156 @@
+#This project will utilize the following dataset provided by Charolotte Chaze as part of the Break into Tech Data Analytics Certificate Course. 
+
+##DB Fiddle was utilized to run SQL queries from the provided dataset.
+
+**Schema (MySQL v5.7)**
+
+    CREATE TABLE superstore (
+        item_id INTEGER PRIMARY KEY,
+        item_name TEXT,
+        category TEXT,
+        price DECIMAL(10, 2),
+        stock_quantity INTEGER,
+        average_rating DECIMAL(3, 2)
+    );
+    
+    INSERT INTO superstore (item_id, item_name, category, price, stock_quantity, average_rating)
+    VALUES
+        (1, 'Stainless Steel Cookware Set', 'Kitchen Supplies', 89.99, 50, 4.6),
+        (2, 'Memory Foam Mattress', 'Furnishings', 499.99, 30, 4.8),
+        (3, 'Smart LED TV', 'Electronics', 549.00, 20, 4.5),
+        (4, 'Robot Vacuum Cleaner', 'Appliances', 199.50, 40, 4.3),
+        (5, 'Wireless Bluetooth Speaker', 'Electronics', 39.99, 60, 4.2),
+        (6, 'Non-Stick Baking Set', 'Kitchen Supplies', 29.95, 80, 4.4),
+        (7, 'Cotton Bedding Set', 'Furnishings', 89.00, 25, 4.7),
+        (8, 'Smart Home Security Camera', 'Electronics', 79.95, 15, 4.1),
+        (9, 'Air Purifier', 'Appliances', 129.50, 35, 4.6),
+        (10, 'Premium Coffee Maker', 'Kitchen Supplies', 79.99, 50, 4.9),
+        (11, 'Ergonomic Office Chair', 'Furnishings', 189.00, 20, 4.5),
+        (12, 'Wireless Earbuds', 'Electronics', 49.99, 75, 4.3),
+        (13, 'Slow Cooker', 'Appliances', 49.95, 30, 4.7),
+        (14, 'Cutlery Set', 'Kitchen Supplies', 34.50, 40, 4.4),
+        (15, 'Cozy Throw Blanket', 'Furnishings', 24.99, 100, 4.2);
+    
+
+---
+
+**Query #1**
+-- Determine the categories present in the dataset using SELECT statement. Limit 5 to preserve storage space.
+
+    SELECT *
+    FROM superstore
+    LIMIT 5;
+
+| item_id | item_name                    | category         | price  | stock_quantity | average_rating |
+| ------- | ---------------------------- | ---------------- | ------ | -------------- | -------------- |
+| 1       | Stainless Steel Cookware Set | Kitchen Supplies | 89.99  | 50             | 4.60           |
+| 2       | Memory Foam Mattress         | Furnishings      | 499.99 | 30             | 4.80           |
+| 3       | Smart LED TV                 | Electronics      | 549.00 | 20             | 4.50           |
+| 4       | Robot Vacuum Cleaner         | Appliances       | 199.50 | 40             | 4.30           |
+| 5       | Wireless Bluetooth Speaker   | Electronics      | 39.99  | 60             | 4.20           |
+
+---
+**Query #2**
+-- Order items sold by price in ascending order using ORDER BY statement.
+
+    SELECT *
+    FROM superstore
+    ORDER BY price;
+
+| item_id | item_name                    | category         | price  | stock_quantity | average_rating |
+| ------- | ---------------------------- | ---------------- | ------ | -------------- | -------------- |
+| 15      | Cozy Throw Blanket           | Furnishings      | 24.99  | 100            | 4.20           |
+| 6       | Non-Stick Baking Set         | Kitchen Supplies | 29.95  | 80             | 4.40           |
+| 14      | Cutlery Set                  | Kitchen Supplies | 34.50  | 40             | 4.40           |
+| 5       | Wireless Bluetooth Speaker   | Electronics      | 39.99  | 60             | 4.20           |
+| 13      | Slow Cooker                  | Appliances       | 49.95  | 30             | 4.70           |
+| 12      | Wireless Earbuds             | Electronics      | 49.99  | 75             | 4.30           |
+| 8       | Smart Home Security Camera   | Electronics      | 79.95  | 15             | 4.10           |
+| 10      | Premium Coffee Maker         | Kitchen Supplies | 79.99  | 50             | 4.90           |
+| 7       | Cotton Bedding Set           | Furnishings      | 89.00  | 25             | 4.70           |
+| 1       | Stainless Steel Cookware Set | Kitchen Supplies | 89.99  | 50             | 4.60           |
+| 9       | Air Purifier                 | Appliances       | 129.50 | 35             | 4.60           |
+| 11      | Ergonomic Office Chair       | Furnishings      | 189.00 | 20             | 4.50           |
+| 4       | Robot Vacuum Cleaner         | Appliances       | 199.50 | 40             | 4.30           |
+| 2       | Memory Foam Mattress         | Furnishings      | 499.99 | 30             | 4.80           |
+| 3       | Smart LED TV                 | Electronics      | 549.00 | 20             | 4.50           |
+
+---
+**Query #3**
+-- Find the average price for items sold according to category using AVG and GROUP BY statements.
+
+    SELECT AVG(price), category
+    FROM superstore
+    GROUP BY category;
+
+| AVG(price) | category         |
+| ---------- | ---------------- |
+| 126.316667 | Appliances       |
+| 179.732500 | Electronics      |
+| 200.745000 | Furnishings      |
+| 58.607500  | Kitchen Supplies |
+
+---
+**Query #4**
+-- Find the highest priced item categorized under Appliances using MAX and WHERE categories:
+
+    SELECT MAX(price), category
+    FROM superstore
+    WHERE category = 'Appliances';
+
+| MAX(price) | category   |
+| ---------- | ---------- |
+| 199.50     | Appliances |
+
+---
+**Query #5**
+-- Find the lowest priced item categorized under Kitchen Supplies using MIN and WHERE statements:
+
+    SELECT MIN(price), category
+    FROM superstore
+    WHERE category = 'Kitchen Supplies';
+
+| MIN(price) | category         |
+| ---------- | ---------------- |
+| 29.95      | Kitchen Supplies |
+
+---
+**Query #6**
+-- How much stock does the store currently have in inventory using SUM statment:
+
+    SELECT SUM(stock_quantity)
+    From superstore;
+
+| SUM(stock_quantity) |
+| ------------------- |
+| 670                 |
+
+---
+**Query #7**
+-- How much stock does the store classify as Furnishings using SUM, WHERE, and GROUP BY statements:
+
+    SELECT SUM(stock_quantity), category
+    From superstore
+    WHERE category = 'Furnishings'
+    GROUP BY category;
+
+| SUM(stock_quantity) | category    |
+| ------------------- | ----------- |
+| 175                 | Furnishings |
+
+---
+**Query #8**
+-- How much stock does the store classify as Electronics using SUM, WHERE, and GROUP BY statements:
+
+    SELECT SUM(stock_quantity), category
+    From superstore
+    WHERE category = 'Electronics'
+    GROUP BY category;
+
+| SUM(stock_quantity) | category    |
+| ------------------- | ----------- |
+| 170                 | Electronics |
+
+---
+
+[View on DB Fiddle](https://www.db-fiddle.com/f/PvBAaQwEUSWAxZCsg4Vmx/0)
