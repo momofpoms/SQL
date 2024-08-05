@@ -1,0 +1,67 @@
+#This project will utilize the following data provided by Charolotte Chaze as part of the Break into Tech Data Analytics Certificate Course. 
+
+##SQLite Studio was utilized to query multiple tables within a database provided by the Break into Tech program. 
+
+##Multiple tables containing data on customers and orders were querried to find quantifying statistics.
+
+--Determine what is contained in the table. Sort through data to ensure consistency of data types using this query:
+SELECT *
+FROM BIT_DB.JanSales;
+--orderID, Product, Quantity, price, orderdate, location
+
+#Prompt 1: How many orders were placed in January?
+--Process: Answer the prompt by filtering orderID enteries.
+--Results from Query: There were 9681 orders placed in January. 
+SELECT COUNT(orderID)
+FROM BIT_DB.JanSales
+WHERE length(orderID) =6
+AND orderID <> 'Order ID';
+
+#Prompt 2: How many of those orders were for an iPhone?
+--Process: Filter as before, Select where product is = iPhone
+--Results from Query: There were 379 orders containing iPhones out of the January orders.
+SELECT COUNT(Product)
+FROM BIT_DB.JanSales
+WHERE Product = 'iPhone'
+AND length(orderID) =6
+AND orderID <> 'Order ID';
+
+#Prompt 3: Select the customer account number for all the orders placed in February.
+--Process: Distinct account numbers selected after join to second table and enteries filtered according to format.
+--Results from Query: There are 11986 unique account numbers for orders placed in February.
+SELECT distinct customers.acctnum as account_numbers
+FROM BIT_DB.customers
+JOIN BIT_DB.FebSales
+ON customers.order_id = FebSales.orderID 
+WHERE length(FebSales.orderID) =6
+AND FebSales.orderID <> 'Order ID';
+
+#Prompt 4: Which product was the cheapest one sold in January, and what was the price?
+--Process: Return the distinct product name and price of the product and price equal to the lowest priced item sold. Assign descriptive aliases.
+--Results from Query: AAA Batteries (4-pack) was the lowest priced item at 2.99. 
+SELECT distinct Product, price as lowest_priced
+FROM BIT_DB.JanSales
+WHERE price in (SELECT min(price) FROM BIT_DB.JanSales);
+
+#Prompt 5: What is the total revenue for each product sold in January?
+--Process: Find the sum of the quantity of each product sold, grouped by product, multiplied by the price, rounded to two decimal places and given alias of total_rev.
+SELECT Product, ROUND((SUM(quantity)*price), 2) as total_rev
+FROM BIT_DB.JanSales
+GROUP BY Product;
+
+#Prompt 6: Which products were sold in February at 548 Lincoln St, Seattle, WA 98101, how many of each were sold, what was the total revenue?
+--Process: Return the products, sum of quantity of each product, and total revenue, filtered by location. 
+SELECT Product, SUM(Quantity), SUM(Quantity)*price AS Revenue
+FROM BIT_DB.FebSales
+WHERE location = '548 Lincoln St, Seattle, WA 98101'
+GROUP BY Product;
+
+#Prompt 7: How many customers ordered more than 2 products at a time in February and what was the average amount spent for those customers?
+--Process: Join customers and FebSales tables to find distinct users filtered by Quantity and valid order ID format and aggregate the data for average amount spend on those orders.
+SELECT COUNT(distinct customers.acctnum) AS customers, AVG(price*Quantity) AS avg_spent
+FROM BIT_DB.customers
+JOIN BIT_DB.FebSales
+ON customers.order_id = FebSales.orderID
+WHERE FebSales.Quantity > 2
+AND length(orderID) =6
+AND orderID <> 'OrderID';
