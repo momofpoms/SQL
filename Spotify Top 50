@@ -55,3 +55,13 @@ SELECT AVG(tempo) as top_ten_avg_tempo
 FROM BIT_DB.Spotifydata
 WHERE id >= 1
 AND id <= 10;
+
+--Calculate the average popularity for the artists in the Spotify data table.
+--Then for every artist with an avg pop >=90, show their name, pop, and lable them a "TopStar".
+WITH popTable AS ( SELECT spotify.artist_name, AVG(spotify.popularity) as avg_pop
+FROM Spotifydata spotify
+GROUP BY spotify.artist_name
+)
+SELECT artist_name, avg_pop, 'Top Star' AS tag
+FROM popTable
+WHERE avg_pop >=90;
