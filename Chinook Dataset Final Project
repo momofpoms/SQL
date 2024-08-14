@@ -1,0 +1,153 @@
+--Chinook Database Project, part of Break Into Tech Course. Dataset provided through course. 
+
+#CSV uploaded to new database on SQLite Studio
+
+--Examine table contents of customers.
+SELECT *
+FROM customers
+LIMIT 5;
+
+--Show customers outside of the US.
+SELECT FirstName, LastName, CustomerId, Country
+FROM customers
+WHERE Country <> 'USA' 
+ORDER BY Country ASC;
+
+--Show only customers from Brazil.
+SELECT *
+FROM customers
+WHERE Country = 'Brazil'
+ORDER BY FirstName ASC;
+
+--Find the invoices of customers who are from Brazil. Include Customer's Full name, Invovice ID, Invoice Date, and Billing Country.
+SELECT c.FirstName, c.LastName, i.InvoiceId, i.InvoiceDate, i.BillingCountry
+FROM customers c
+JOIN invoices i
+ON c.CustomerId = i.CustomerId
+WHERE i.BillingCountry = 'Brazil'
+ORDER BY i.InvoiceId;
+
+--Show the employees who are Sales Agents.
+SELECT *
+FROM employees
+WHERE Title = 'Sales Support Agent';
+
+--Find a unique list of billing countries and number of invoices from the Invoice table.
+SELECT distinct BillingCountry, COUNT(BillingCountry) as Invoice_count
+FROM invoices
+GROUP BY BillingCountry
+ORDER BY BillingCountry ASC;
+
+--Provide a query that shows the invoices associated with each sales agent. Include the Sales Agentt's full name.
+WITH SalesLink AS 
+(
+SELECT e.EmployeeId, e.LastName, e.FirstName, c.CustomerId
+FROM employees e
+JOIN customers c
+ON e.EmployeeId = c.SupportRepId
+)
+SELECT LastName, FirstName, InvoiceId
+FROM SalesLink
+JOIN invoices
+ON SalesLink.CustomerId = invoices.CustomerId
+ORDER BY LastName ASC;
+
+--Show the invoice total for each customer, customer name, country, and sales agent.
+WITH CustomerInvoice AS 
+(
+SELECT i.Total as invoice_total, c.FirstName as customer_first, c.LastName as customer_last, c.Country, c.SupportRepId as agent_ID
+FROM customers c
+FULL JOIN invoices i
+ON c.CustomerId = i.CustomerId
+) 
+SELECT customer_first, customer_last, SUM(invoice_total) as Invoice_Total, Country, e.FirstName as agent_first_name, e.LastName as agent_last_name
+FROM CustomerInvoice
+JOIN employees e
+ON CustomerInvoice.agent_ID = e.EmployeeId
+GROUP BY customer_first;
+
+--Show every invoice, customer first and last name, country, and sales agent first and last name.
+SELECT c.FirstName as customer_first, c.LastName as customer_last, c.Country, i.Total as invoice_total, e.FirstName as Agent_First_Name, e.LastName as Agent_Last_Name
+FROM customers c
+JOIN invoices i ON c.CustomerId = i.CustomerId
+JOIN employees e ON c.SupportRepId = e.EmployeeId;
+
+--How many invoices are from 2009?
+SELECT COUNT (distinct InvoiceId) as Invoices2009
+FROM invoices
+WHERE InvoiceDate like '%2009%';
+
+--What are the total sales for 2009?
+SELECT ROUND(SUM(Total),2) as Total_Sales2009
+FROM invoices
+WHERE InvoiceDate like '%2009%';
+
+--Write a query that includes the purchased track name with each invoice line ID.
+SELECT i.invoiceLineID, t.Name
+FROM invoice_items i
+JOIN tracks t
+ON i.TrackId = t.TrackId
+WHERE t.Name <> ' '
+ORDER BY i.invoiceLineID;
+
+--Write a query that includes the purchased track name AND artist name with each invoice line ID.
+SELECT t.Name as track_name, a.Name as artist_name, i.invoiceLineId
+FROM tracks t
+JOIN invoice_items i ON t.TrackId = i.TrackId
+LEFT JOIN albums ON t.AlbumId = albums.AlbumId
+JOIN artists a ON albums.ArtistId = a.ArtistId
+ORDER BY t.Name ASC;
+
+--Provide a query that shows all the tracks, and include the album name, media type, and genre.
+SELECT t.Name as track_name, a.Title as album_name, m.Name as media_type, g.Name as track_genre
+FROM tracks t
+LEFT JOIN albums a ON t.AlbumId = a.AlbumId
+LEFT JOIN media_types m ON t.MediaTypeId = m.MediaTypeId
+LEFT JOIN genres g ON t.GenreId = g.GenreId
+ORDER BY t.Name;
+
+--Show the total sales made by each agent.
+SELECT e.LastName, e.FirstName, ROUND(SUM(i.Total), 2) as TotalSales
+FROM employees e
+JOIN customers c ON e.EmployeeId = c.SupportRepId
+JOIN invoices i ON c.CustomerId = i.CustomerId
+GROUP BY e.LastName;
+
+-- Which sales agent made the most money in 2009?
+SELECT e.LastName, e.FirstName, ROUND(SUM(i.Total), 2) as TotalSales_2009
+FROM employees e
+JOIN customers c ON e.EmployeeId = c.SupportRepId
+JOIN invoices i ON c.CustomerId = i.CustomerId
+WHERE i.InvoiceDate like '%2009%'
+GROUP BY e.LastName
+ORDER BY ROUND(SUM(i.Total), 2) DESC
+LIMIT 1;
+
+--What genre of music do residents in the state of Washington listen to most, based off of sales?
+SELECT g.Name as music_genre, COUNT(i.InvoiceId) as number_sold
+FROM invoice_items inv
+JOIN invoices i ON inv.InvoiceId = i.InvoiceId
+JOIN tracks t ON inv.TrackId = t.TrackId
+JOIN genres g ON t.GenreId = g.GenreId
+WHERE i.BillingState = 'WA'
+GROUP BY g.Name;
+
+--How many artists are in each genre? 
+SELECT g.Name as 'Genre', COUNT(distinct art.ArtistID) as artist_count
+FROM albums a
+JOIN artists art ON a.ArtistId = art.ArtistId
+JOIN tracks t ON a.AlbumID = t.AlbumId
+JOIN genres g ON t.GenreId = g.GenreId
+GROUP BY g.Name;
+
+--How many genres does each artist belong to?
+SELECT artist, COUNT(genre_name) as num_of_genres
+FROM (
+SELECT distinct art.Name as artist, g.Name as genre_name
+FROM artists art
+LEFT JOIN albums a ON art.ArtistId = a.ArtistId
+LEFT JOIN tracks t ON a.AlbumId = t.AlbumId
+JOIN genres g ON t.GenreId = g.GenreId)
+AS distinct_genres
+GROUP BY artist
+ORDER BY artist;
