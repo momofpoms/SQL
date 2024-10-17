@@ -1,6 +1,20 @@
---Chinook Database Project, part of Break Into Tech Course. Dataset provided through course. 
+# Description: 
+## This project will utilize data from a fictional digital media store called Chinook. The data includes 11 tables containing information about artists, albums, media tracks, invoices, and customers. The database has several tables that relate to each other but not all tables are related.   
 
-#CSV uploaded to new database on SQLite Studio
+# Business Task:
+## This database will be used to provide insight into customer locale, spending patters, and preferences.  Employee success will also be gauged using sales data from the year based on related sales data.
+
+# Sources:
+## Database CSV provided through Break into Tech Data Analytics Certificate Course.
+
+## Tools:
+## SQLite Studio - Query data
+
+# Data Cleaning and Preparation:
+## Queries utilize SQL functions that specify distinct entries, do not contain, window functions, joins, and partition by in order to produce a quality data analysis.
+
+#Exploratory Data Analysis:
+All categories selected to determine data to be examined, followed by a several queries determining the primary location of consumers, and relational data gathered from the other tables within the database: 
 
 --Examine table contents of customers.
 SELECT *
@@ -38,7 +52,7 @@ FROM invoices
 GROUP BY BillingCountry
 ORDER BY BillingCountry ASC;
 
---Provide a query that shows the invoices associated with each sales agent. Include the Sales Agentt's full name.
+--Provide a query that shows the invoices associated with each sales agent. Include the Sales Agent's full name.
 WITH SalesLink AS 
 (
 SELECT e.EmployeeId, e.LastName, e.FirstName, c.CustomerId
@@ -151,3 +165,14 @@ JOIN genres g ON t.GenreId = g.GenreId)
 AS distinct_genres
 GROUP BY artist
 ORDER BY artist;
+
+# Findings:
+## Consumers are located in a variety of countries outside of the United States. Not all purchases include a sales agent but of the ones that do, the majority of sales belong to one employee. Number of consumers within each country can be identified, the United States contains the most customers. 
+
+
+# Recommendations:
+## Our analysis shows us trends within different country’s purchasing habits and habits amongst members and non members. Members are more likely to purchase with an employee, therefore increasing employee morale and incentivizing employees to encourage all customers to become members. We can further narrow down what genres are most popular in what countries or states and launch appropriate marketing campaigns focused on these findings. 
+
+# Limitations:
+## This database utilized a relatively small set for a medium sized company. Because the company contained many different tables, opportunities to miss out on valuable data due to changes in formatting and the ability to relate the databases could be improved. 
+
